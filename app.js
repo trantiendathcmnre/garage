@@ -74,94 +74,98 @@ app.use(function(req, res, next) {
     // }
   });
 
-//Use controller nha cung cap
-var nhacungcap=require('./controllers/nhacungcap');
-app.use('/nhacungcap',nhacungcap);
-//Use controller hang xe
+app.get('/test', function(req, res) {
+    res.send('test success!');
+});
+
+// //Use controller nha cung cap
+// var nhacungcap=require('./controllers/nhacungcap');
+// app.use('/nhacungcap',nhacungcap);
+// Use controller hang xe
 var hangxe=require('./controllers/hangxe');
 app.use('/hangxe',hangxe);
-//Use controller dong xe
-var dongxe=require('./controllers/dongxe');
-app.use('/dongxe',dongxe);
+// //Use controller dong xe
+// var dongxe=require('./controllers/dongxe');
+// app.use('/dongxe',dongxe);
 //Use controller don vi lam viec
 var donvi=require('./controllers/donvilamviec');
 app.use('/donvilamviec',donvi);
 //Use controller danh muc phu tung
 var danhmucphutung=require('./controllers/danhmucphutung');
 app.use('/danhmucphutung',danhmucphutung);
-//Use controller phu tung
-var phutung=require('./controllers/phutung');
-app.use('/phutung',phutung);
-//Use controller phieunhap
-var phieunhap=require('./controllers/phieunhap');
-app.use('/phieunhap',phieunhap);
-//Use controller phieudathang
-var phieudathang=require('./controllers/phieudathang');
-app.use('/lapphieudat',phieudathang);
-//Use controller khach hang
-var khachhang=require('./controllers/khachhang');
-app.use('/khachhang',khachhang);
-//Use controller xe
-var xe=require('./controllers/xe');
-app.use('/xe',xe);
-//Use controller nhan vien
-var nhanvien=require('./controllers/nhanvien');
-app.use('/nhanvien',nhanvien);
-//Use controller phieu kiem tra
-var phieukham=require('./controllers/phieukham');
-app.use('/phieukham',phieukham);
-//Use controller bao gia cong
-var baogiacong=require('./controllers/baogiacong');
-app.use('/baogiacong',baogiacong);
-//Use controller don hang
-var donhang=require('./controllers/donhang');
-app.use('/donhang',donhang);
-//Use controller don vi tinh
-var donvitinh=require('./controllers/donvitinh');
-app.use('/donvitinh',donvitinh);
-//Use user
-var users=require('./controllers/users');
-app.use('/users',users);
-//Use  xe sendmail
-var sendmail=require('./controllers/sendmail');
-app.use('/sendmail',sendmail);
-//Use nhom nguoi dung
-var nhomnguoidung=require('./controllers/nhomnguoidung');
-app.use('/nhomnguoidung',nhomnguoidung);
-//Use nguoi dung
-var nguoidung=require('./controllers/nguoidung');
-app.use('/nguoidung',nguoidung);
-//Use bao tri
-var baotri=require('./controllers/baotri');
-app.use('/baotri',baotri);
-//Use phieuxuat
-var phieuxuat=require('./controllers/phieuxuat');
-app.use('/phieuxuat',phieuxuat);
-//Use thong ke
-var thongke=require('./controllers/thongke');
-app.use('/thongke',thongke);
+// //Use controller phu tung
+// var phutung=require('./controllers/phutung');
+// app.use('/phutung',phutung);
+// //Use controller phieunhap
+// var phieunhap=require('./controllers/phieunhap');
+// app.use('/phieunhap',phieunhap);
+// //Use controller phieudathang
+// var phieudathang=require('./controllers/phieudathang');
+// app.use('/lapphieudat',phieudathang);
+// //Use controller khach hang
+// var khachhang=require('./controllers/khachhang');
+// app.use('/khachhang',khachhang);
+// //Use controller xe
+// var xe=require('./controllers/xe');
+// app.use('/xe',xe);
+// //Use controller nhan vien
+// var nhanvien=require('./controllers/nhanvien');
+// app.use('/nhanvien',nhanvien);
+// //Use controller phieu kiem tra
+// var phieukham=require('./controllers/phieukham');
+// app.use('/phieukham',phieukham);
+// //Use controller bao gia cong
+// var baogiacong=require('./controllers/baogiacong');
+// app.use('/baogiacong',baogiacong);
+// //Use controller don hang
+// var donhang=require('./controllers/donhang');
+// app.use('/donhang',donhang);
+// //Use controller don vi tinh
+// var donvitinh=require('./controllers/donvitinh');
+// app.use('/donvitinh',donvitinh);
+// //Use user
+// var users=require('./controllers/users');
+// app.use('/users',users);
+// //Use  xe sendmail
+// var sendmail=require('./controllers/sendmail');
+// app.use('/sendmail',sendmail);
+// //Use nhom nguoi dung
+// var nhomnguoidung=require('./controllers/nhomnguoidung');
+// app.use('/nhomnguoidung',nhomnguoidung);
+// //Use nguoi dung
+// var nguoidung=require('./controllers/nguoidung');
+// app.use('/nguoidung',nguoidung);
+// //Use bao tri
+// var baotri=require('./controllers/baotri');
+// app.use('/baotri',baotri);
+// //Use phieuxuat
+// var phieuxuat=require('./controllers/phieuxuat');
+// app.use('/phieuxuat',phieuxuat);
+// //Use thong ke
+// var thongke=require('./controllers/thongke');
+// app.use('/thongke',thongke);
 
 
-//controller cho user khach hang------------------
-var ulogin=require('./controllers_user/loginUser');
-app.use('/ulogin',ulogin);
-//user KH
-var ukhachhang=require('./controllers_user/khachhangUser');
-app.use('/ukhachhang',ukhachhang);
-//Use XE
-var uxe=require('./controllers_user/xeUser');
-app.use('/uxe',uxe);
-//Use DONGXE
-var udongxe=require('./controllers_user/dongxeUser');
-app.use('/udongxe',udongxe);
-//Use PHUTUNG
-var uphutung=require('./controllers_user/phutungUser');
-app.use('/uphutung',uphutung);
-//Use LSSC
-var usuachua=require('./controllers_user/donhangUser');
-app.use('/usuachua',usuachua);
+// //controller cho user khach hang------------------
+// var ulogin=require('./controllers_user/loginUser');
+// app.use('/ulogin',ulogin);
+// //user KH
+// var ukhachhang=require('./controllers_user/khachhangUser');
+// app.use('/ukhachhang',ukhachhang);
+// //Use XE
+// var uxe=require('./controllers_user/xeUser');
+// app.use('/uxe',uxe);
+// //Use DONGXE
+// var udongxe=require('./controllers_user/dongxeUser');
+// app.use('/udongxe',udongxe);
+// //Use PHUTUNG
+// var uphutung=require('./controllers_user/phutungUser');
+// app.use('/uphutung',uphutung);
+// //Use LSSC
+// var usuachua=require('./controllers_user/donhangUser');
+// app.use('/usuachua',usuachua);
 //------------------------------------------------
-const p =process.env.PORT || 4201;
+const p =process.env.PORT || 8000;
 var server=app.listen(p,function(){
     var host=server.address().address;
     //var host="103.70.28.56";

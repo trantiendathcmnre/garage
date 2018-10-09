@@ -1,98 +1,82 @@
-var express=require('express');
-var router=express.Router();
-var Db=require('../modules/db');
-var result=require('../modules/response-result');
-var HangXe=Db.extend({tableName:"tgr_hang_xe"});
-var hangxe=new HangXe();
+let express = require('express');
+let mysql = require('mysql');
+let router = express.Router();
+let config = require('../modules/db');
+let response = require('../modules/response-result');
+let hangxe = mysql.createConnection(config);
 
-router.get('/',function(req,res){
-    hangxe.find('all',function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+router.get('/', function(req,res) {
+
+    let query = "SELECT * FROM tgr_hang_xe";
+    hangxe.query( query ,function(err,rows,fields){
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
 
-router.get('/:id',function(req,res){
-    hangxe.find('first',{where: "id = '"+req.params.id+"'"},function(err,row){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        }else
-        {
-            res.send(result.data(row));
+router.get('/:id', function(req,res){
+
+    let query = "SELECT * FROM tgr_hang_xe WHERE id = ? ";
+    let attributes = [ req.params.id ];
+    hangxe.query( query , attributes, function(err,row) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(row));
         }
     });
 });
+
 
 router.post('/', function(req, res){
-    if(req.body.ma && req.body.ten){
-        hangxe.set('ma',req.body.ma);
-        hangxe.set('ten',req.body.ten);
-        hangxe.set('mo_ta',req.body.mo_ta);
-        hangxe.save(function(err, row){
-            if(err){
-                res.send(result.error(1,"Database Error !"));
-            }else {
-                res.send(result.data(row));
+    if(req.body.ma) {
+
+        let query = "INSERT INTO tgr_hang_xe (ma, ten, mo_ta ) VALUES(?,?,?)";
+        let attributes = [ req.body.ma,req.body.ten , req.body.mo_ta ];
+        hangxe.query(query, attributes, (err, results, fields) => {
+            if (err) {
+                res.send(response.error(1,"Database Error !"));
+            } else {
+                // get inserted id
+                res.send(response.message("Inserted id " + results.insertId));
             }
-        });
+        }); 
+
     } else {
-        res.send(result.error(2,"Missing field"));
+        res.send(response.error(2,"Missing field"));
     }
 });
 
-router.put('/',function(req,res){
-    if(req.body.ten)
-    {
-        hangxe.set('ten',req.body.ten);
-        hangxe.set('mo_ta',req.body.mo_ta);
-        hangxe.save("ma='"+req.body.ma+"'",function(err,row){
-            if(err){
-                res.send(result.error(1,"Database Error !"));
-            }else {
-                res.send(result.data(hangxe));
-
-            }
-       });
-    }
-    else{
-        res.send(result.error(2,"Missing field"));
-    }
-});
-router.delete('/:id',function(req,res){
-    hangxe.find('count',{where :'id="'+req.params.id+'"'},function(err,kq){
-        if(err)
-        res.send(err);
-        else if (kq>0){   
-            hangxe.remove('id="'+req.params.id+'"',function(err,row){
-                    if(err)
-                    {
-                        res.send(result.error(1,'Database Error !'));
-                    }
-                    else
-                    {
-                        res.send(result.error(0,'Delete Successful !'));
-                    }
-                });
-            } else{
-                res.send(result.error(3,"Data Not Found !"));
-            }
+router.put('/:id',function(req,res) {
+        
+    let query = "UPDATE tgr_hang_xe SET ten = ?, mo_ta = ? WHERE id = ?";
+    let attributes = [req.body.ten , req.body.mo_ta, req.params.id ];
+    hangxe.query(query, attributes, (err, results, fields) => {
+        if (err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            // records updated 
+            res.send(response.message(results.affectedRows + " records updated"));
+        }
     });
 });
-// router.get('/taoma/id',function(req,res){
-//     hangxe.query("SELECT createid() as id",function(err,row,fields){
-//         if(err)
-//         {
-//             res.send(result.error(1,"Database Error !"));
-//         } else
-//         {
-//             res.send(result.data(row));
-//         }
-//     });
-// });
+
+router.delete('/:id',function(req,res) {
+
+    let query = "DELETE FROM tgr_hang_xe WHERE id = ? ";
+    let attributes = [ req.params.id ];
+    hangxe.query(query, attributes, (err, results, fields) => {
+        if (err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            // records deleted 
+            res.send(response.message(results.affectedRows + " records deleted"));
+        }
+    });
+    
+});
+
 module.exports =router;
