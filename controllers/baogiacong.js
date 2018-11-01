@@ -1,10 +1,10 @@
-var express=require('express');
-var router=express.Router();
-var Db=require('../modules/db');
-var result=require('../modules/response-result');
-var BaoGiaCong=Db.extend({tableName:"baogiacong"});
-var baogiacong=new BaoGiaCong();
-router.use(function(req,res,next){next();});
+let express = require('express');
+let mysql = require('mysql');
+let router = express.Router();
+let config = require('../modules/db');
+let response = require('../modules/response-result');
+let baogiacong = mysql.createConnection(config);
+
 router.get('/',function(req,res){
     baogiacong.find('all',function(err,rows,fields){
         if(err)

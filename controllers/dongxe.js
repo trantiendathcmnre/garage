@@ -1,108 +1,98 @@
-var express=require('express');
-var router=express.Router();
-var Db=require('../modules/db');
-var result=require('../modules/response-result');
-var DongXe=Db.extend({tableName:"tgr_dong_xe"});
-var dongxe=new DongXe();
+let express = require('express');
+let mysql = require('mysql');
+let router = express.Router();
+let config = require('../modules/db');
+let response = require('../modules/response-result');
+let dongxe = mysql.createConnection(config);
+
 router.get('/',function(req,res){
-    dongxe.query("SELECT * from tgr_dong_xe dx,tgr_hang_xe hx where dx.hangxe_id=hx.id",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+
+    let query = "SELECT dx.*, hx.ten AS ten_hangxe  from tgr_dong_xe dx , tgr_hang_xe hx where dx.hangxe_id = hx.id";
+    dongxe.query( query ,function(err,rows,fields){
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
-router.get('/:id',function(req,res){
-    dongxe.find('first',{where: "id = '"+req.params.id+"'"},function(err,row){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        }else
-        {
-            res.send(result.data(row));
+
+router.get('/:id', function(req,res){
+
+    let query = "SELECT * FROM tgr_dong_xe WHERE id = ? ";
+    let attributes = [ req.params.id ];
+    dongxe.query( query , attributes, function(err,row) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(row));
         }
     });
 });
-router.get('/hangxe_id/:id',function(req,res){
-    dongxe.find('all',{where: "hangxe_id = '"+req.params.id+"'"},function(err,rows){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        }else
-        {
-            res.send(result.data(rows));
-        }
-    });
-});
+
 router.post('/', function(req, res){
-    console.log(req.body);
-    if(req.body.id && req.body.ten){
-        dongxe.set('id',req.body.id);
-        dongxe.set('ten',req.body.ten);
-        dongxe.set('mo_ta',req.body.mo_ta);
-        dongxe.set('hangxe_id',req.body.hangxe_id);
-        dongxe.save(function(err, row){
-            if(err){
-                res.send(result.error(1,"Database Error !"));
-            }else {
-                res.send(result.data(dongxe));
+    if( req.body.ten && req.body.hangxe_id){
+
+        let query = "INSERT INTO tgr_dong_xe ( ten, mo_ta, hangxe_id ) VALUES(?,?,?)";
+        let attributes = [ req.body.ten, req.body.mo_ta, req.body.hangxe_id ];
+        dongxe.query(query, attributes, (err, results, fields) => {
+            if (err) {
+                res.send(response.error(1,"Database Error !"));
+            } else {
+                // get inserted id
+                res.send(response.message("Inserted id " + results.insertId));
             }
-        });
+        }); 
     }else{
-        res.send(result.error(2,"Missing field"));
+        res.send(response.error(2,"Missing field"));
     }
 });
-router.put('/',function(req,res){
-    if(req.body.id && req.body.ten)
-    {
-        dongxe.set('ten',req.body.ten);
-        dongxe.set('mo_ta',req.body.mo_ta);
-        dongxe.set('hangxe_id',req.body.hangxe_id);
-        dongxe.save("id='"+req.body.id+"'",function(err,row){
-            if(err){
-                res.send(result.error(1,"Database Error !"));
-            }else {
-                res.send(result.data(dongxe));
 
+router.put('/:id',function(req,res){
+    if(req.body.hangxe_id && req.body.ten) {
+
+        let query = "UPDATE tgr_dong_xe SET mo_ta = ? WHERE id = ?";
+        let attributes = [ req.body.mo_ta ];
+        dongxe.query(query, attributes, (err, results, fields) => {
+            if (err) {
+                res.send(response.error(1,"Database Error !"));
+            } else {
+                // get updated id
+                res.send(response.message(results.affectedRows + " records updated"));
             }
-       });
+        }); 
     }
     else{
-        res.send(result.error(2,"Missing field"));
+        res.send(response.error(2,"Missing field"));
     }
 });
+
 router.delete('/:id',function(req,res){
-    dongxe.find('count',{where :'id="'+req.params.id+'"'},function(err,kq){
-        if(err)
-        res.send(err);
-        else if (kq>0){   
-            dongxe.remove('id="'+req.params.id+'"',function(err,row){
-                    if(err)
-                    {
-                        res.send(result.error(1,'Database Error !'));
-                    }
-                    else
-                    {
-                        res.send(result.error(0,'Delete Successful !'));
-                    }
-                });
-            } else{
-                res.send(result.error(3,"Data Not Found !"));
-            }
+    let query = "DELETE FROM tgr_dong_xe WHERE id = ? ";
+    let attributes = [ req.params.id ];
+    dongxe.query(query, attributes, (err, results, fields) => {
+        if (err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            // records deleted 
+            res.send(response.message(results.affectedRows + " records deleted"));
+        }
     });
 });
-// router.get('/taoma/id',function(req,res){
-//     dongxe.query("SELECT createid() as id",function(err,row,fields){
-//         if(err)
-//         {
-//             res.send(result.error(1,"Database Error !"));
-//         } else
-//         {
-//             res.send(result.data(row));
-//         }
-//     });
-// });
+
+router.get('/search/:id', function(req,res) {
+
+    let query = "SELECT dx.*, hx.ten AS ten_hangxe from tgr_dong_xe dx ";
+    query += "INNER JOIN tgr_hang_xe hx ";
+    query += "ON dx.hangxe_id = hx.id and hx.id = ?";
+    let attributes = [req.params.id];
+    dongxe.query( query, attributes ,function(err,rows,fields){
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
+        }
+    });
+});
+
 module.exports =router;

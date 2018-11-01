@@ -1,83 +1,82 @@
-var express=require('express');
-var router=express.Router();
-var Db=require('../modules/db');
-var result=require('../modules/response-result');
-var Donvitinh=Db.extend({tableName:"donvitinh"});
-var donvitinh=new Donvitinh();
+let express = require('express');
+let mysql = require('mysql');
+let router = express.Router();
+let config = require('../modules/db');
+let response = require('../modules/response-result');
+let donvitinh = mysql.createConnection(config);
+
 router.get('/',function(req,res){
-    donvitinh.find('all',function(err,rows,fields){
-        if(err)
-        {
-            res.send(err);
-            // res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+    let query = "SELECT *  from tgr_don_vi_tinh";
+    donvitinh.query( query ,function(err,rows,fields){
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
-router.get('/:id',function(req,res){
-    donvitinh.find('first',{where: "ID_DVT ="+req.params.id},function(err,row){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        }else
-        {
-            res.send(result.data(row));
+
+router.get('/:id(\\d+)',function(req,res){
+    let query = "SELECT *  from tgr_don_vi_tinh WHERE id = ?";
+    let attributes = [ req.params.id ];
+    donvitinh.query( query, attributes ,function(err,rows,fields){
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
+
 router.post('/', function(req, res){
-    if(req.body.TENDVT){
-        donvitinh.set('TENDVT',req.body.TENDVT);
-        donvitinh.set('GHICHU_DVT',req.body.GHICHU_DVT);
-        donvitinh.save(function(err, row){
-            if(err){
-                res.send(result.error(1,"Database Error !"));
-            }else {
-                res.send(result.data(donvitinh));
+    if( req.body.ten ){
+
+        let query = "INSERT INTO tgr_don_vi_tinh ( ten, ghi_chu ) VALUES(?,?)";
+        let attributes = [ req.body.ten, req.body.ghi_chu ];
+        donvitinh.query(query, attributes, (err, results, fields) => {
+            if (err) {
+                res.send(response.error(1,"Database Error !"));
+            } else {
+                // get inserted id
+                res.send(response.message("Inserted id " + results.insertId));
             }
-        });
+        }); 
     }else{
-        res.send(result.error(2,"Missing field"));
+        res.send(response.error(2,"Missing field"));
     }
 });
-router.put('/',function(req,res){
-    if(req.body.TENDVT)
-    {
-        donvitinh.set('TENDVT',req.body.TENDVT);
-        donvitinh.set('GHICHU_DVT',req.body.GHICHU_DVT);
-        donvitinh.save("ID_DVT="+req.body.ID_DVT,function(err,row){
-            if(err){
-                res.send(result.error(1,"Database Error !"));
-            }else {
-                res.send(result.data(donvitinh));
 
+router.put('/:id(\\d+)',function(req,res){
+    if(req.body.ten)
+    {
+        let query = "UPDATE tgr_don_vi_tinh SET ghi_chu = ?, ten = ? WHERE id = ?";
+        let attributes = [ req.body.ghi_chu, req.body.ten, req.params.id ];
+        donvitinh.query(query, attributes, (err, results, fields) => {
+            if (err) {
+                res.send(response.error(1,"Database Error !"));
+            } else {
+                // get updated id
+                res.send(response.message(results.affectedRows + " records updated"));
             }
-       });
+        }); 
     }
     else{
         res.send(result.error(2,"Missing field"));
     }
 });
-router.delete('/:id',function(req,res){
-    donvitinh.find('count',{where :'ID_DVT='+req.params.id},function(err,kq){
-        if(err)
-        res.send(err);
-        else if (kq>0){   
-            donvitinh.remove('ID_DVT='+req.params.id,function(err,row){
-                    if(err)
-                    {
-                        res.send(result.error(1,'Database Error !'));
-                    }
-                    else
-                    {
-                        res.send(result.error(0,'Delete Successful !'));
-                    }
-                });
-            } else{
-                res.send(result.error(3,"Data Not Found !"));
-            }
+
+router.delete('/:id(\\d+)',function(req,res){
+
+    let query = "DELETE FROM tgr_don_vi_tinh WHERE id = ? ";
+    let attributes = [ req.params.id ];
+    donvitinh.query(query, attributes, (err, results, fields) => {
+        if (err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            // records deleted 
+            res.send(response.message(results.affectedRows + " records deleted"));
+        }
     });
 });
+
 module.exports =router;

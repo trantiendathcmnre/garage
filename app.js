@@ -1,14 +1,15 @@
-var express=require('express');
-var bodyParser=require('body-parser');
-var multer=require('multer');
-var fs =require('fs');
-var app=express();
-var upload=multer({dest:"tmp/"});
-var result=require('./modules/response-result');
+var express = require('express');
+var bodyParser = require('body-parser');
+var multer = require('multer');
+var fs = require('fs');
+var app = express();
+var upload = multer({dest:"tmp/"});
+var result = require('./modules/response-result');
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended:true}));
-app.use('/img',express.static(__dirname+'/img'));
+app.use(bodyParser.urlencoded({ extended:true }));
+app.use('/img', express.static(__dirname+'/img'));
+app.use('/uploads', express.static(__dirname+'/uploads'));
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept,Authorization");
@@ -78,30 +79,30 @@ app.get('/test', function(req, res) {
     res.send('test success!');
 });
 
-// //Use controller nha cung cap
-// var nhacungcap=require('./controllers/nhacungcap');
-// app.use('/nhacungcap',nhacungcap);
+//Use controller nha cung cap
+var nhacungcap = require('./controllers/nhacungcap');
+app.use('/nhacungcap', nhacungcap);
 // Use controller hang xe
-var hangxe=require('./controllers/hangxe');
-app.use('/hangxe',hangxe);
-// //Use controller dong xe
-// var dongxe=require('./controllers/dongxe');
-// app.use('/dongxe',dongxe);
+var hangxe = require('./controllers/hangxe');
+app.use('/hangxe', hangxe);
+//Use controller dong xe
+var dongxe = require('./controllers/dongxe');
+app.use('/dongxe', dongxe);
 //Use controller don vi lam viec
-var donvi=require('./controllers/donvilamviec');
-app.use('/donvilamviec',donvi);
+var donvi = require('./controllers/donvilamviec');
+app.use('/donvilamviec', donvi);
 //Use controller danh muc phu tung
-var danhmucphutung=require('./controllers/danhmucphutung');
-app.use('/danhmucphutung',danhmucphutung);
-// //Use controller phu tung
-// var phutung=require('./controllers/phutung');
-// app.use('/phutung',phutung);
+var danhmucphutung = require('./controllers/danhmucphutung');
+app.use('/danhmucphutung', danhmucphutung);
+//Use controller phu tung
+var phutung = require('./controllers/phutung');
+app.use('/phutung', phutung);
 // //Use controller phieunhap
 // var phieunhap=require('./controllers/phieunhap');
 // app.use('/phieunhap',phieunhap);
-// //Use controller phieudathang
-// var phieudathang=require('./controllers/phieudathang');
-// app.use('/lapphieudat',phieudathang);
+//Use controller phieu dat hang
+var phieudathang = require('./controllers/phieudathang');
+app.use('/lapphieudat', phieudathang);
 // //Use controller khach hang
 // var khachhang=require('./controllers/khachhang');
 // app.use('/khachhang',khachhang);
@@ -114,15 +115,15 @@ app.use('/danhmucphutung',danhmucphutung);
 // //Use controller phieu kiem tra
 // var phieukham=require('./controllers/phieukham');
 // app.use('/phieukham',phieukham);
-// //Use controller bao gia cong
-// var baogiacong=require('./controllers/baogiacong');
-// app.use('/baogiacong',baogiacong);
+//Use controller bao gia cong
+var baogiacong = require('./controllers/baogiacong');
+app.use('/baogiacong',baogiacong);
 // //Use controller don hang
 // var donhang=require('./controllers/donhang');
 // app.use('/donhang',donhang);
-// //Use controller don vi tinh
-// var donvitinh=require('./controllers/donvitinh');
-// app.use('/donvitinh',donvitinh);
+//Use controller don vi tinh
+var donvitinh = require('./controllers/donvitinh');
+app.use('/donvitinh',donvitinh);
 // //Use user
 // var users=require('./controllers/users');
 // app.use('/users',users);
@@ -165,10 +166,10 @@ app.use('/danhmucphutung',danhmucphutung);
 // var usuachua=require('./controllers_user/donhangUser');
 // app.use('/usuachua',usuachua);
 //------------------------------------------------
-const p =process.env.PORT || 8000;
-var server=app.listen(p,function(){
-    var host=server.address().address;
+const p = process.env.PORT || 8000;
+var server = app.listen(p,function(){
+    var host = server.address().address;
     //var host="103.70.28.56";
-    var port=server.address().port;
+    var port = server.address().port;
     console.log('Server is listening at http://%s:%s',host,port);
 });
