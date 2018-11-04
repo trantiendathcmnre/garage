@@ -7,15 +7,15 @@ let donvi = mysql.createConnection(config);
 
 // get tat ca don vi lam viec
 router.get('/',function(req,res) {
-    donvi.query("SELECT * FROM tgr_don_vi_lam_viec WHERE status <> 'TRASHED'", function (err, result, fields) {
+    donvi.query("SELECT * FROM tgr_don_vi_lam_viec", function (err, result, fields) {
         if (err) throw err;
         res.send(response.data(result));
     });
 });
 
 // get don vi lam viec theo id
-router.get('/:id',function(req,res){
-    donvi.query("SELECT * FROM tgr_don_vi_lam_viec WHERE id = ? AND status <> 'TRASHED'",req.params.id, function (err, result, fields) {
+router.get('/:id(\\d+)',function(req,res){
+    donvi.query("SELECT * FROM tgr_don_vi_lam_viec WHERE id = ?", req.params.id, function (err, result, fields) {
         if (err) throw err;
         res.send(response.data(result));
     }); 
@@ -40,7 +40,7 @@ router.post('/', function(req, res){
 });
 
 // cap nhat thong tin don vi lam viec
-router.put('/:id',function(req,res) {
+router.put('/:id(\\d+)',function(req,res) {
     if(req.body.ten) {
         
         let query = "UPDATE tgr_don_vi_lam_viec SET ten = ? , mo_ta = ? WHERE id = ?";

@@ -28,7 +28,7 @@ router.get('/hoatdong',function(req,res){
         }
     });
 });
-router.get('/donvi/:id',function(req,res){
+router.get('/donvi/:id(\\d+)',function(req,res){
     nhanvien.find('all',{where: "MADONVI = '"+req.params.id+"' and TRANGTHAINV='1'"},function(err,rows,fields){
         if(err)
         {
@@ -106,7 +106,7 @@ router.put('/',function(req,res){
         res.send(result.error(2,"Missing field"));
     }
 });
-router.delete('/:id',function(req,res){
+router.delete('/:id(\\d+)',function(req,res){
     nhanvien.find('count',{where :'MANHANVIEN="'+req.params.id+'"'},function(err,kq){
         if(err)
         res.send(err);

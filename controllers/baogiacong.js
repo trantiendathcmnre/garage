@@ -16,7 +16,7 @@ router.get('/',function(req,res){
         }
     });
 });
-router.get('/:id',function(req,res){
+router.get('/:id(\\d+)',function(req,res){
     baogiacong.find('first',{where: "MABAOGIACONG = '"+req.params.id+"'"},function(err,row){
         if(err)
         {
@@ -74,7 +74,7 @@ router.get('/taoma/mabaogiacong',function(req,res){
         }
     });
 });
-router.delete('/:id',function(req,res){
+router.delete('/:id(\\d+)',function(req,res){
     baogiacong.find('count',{where :'MABAOGIACONG="'+req.params.id+'"'},function(err,kq){
         if(err)
         res.send(err);

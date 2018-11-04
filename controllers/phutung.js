@@ -374,7 +374,7 @@ router.put('/:id', upload.single('filetoupload'), function (req, res) {
 });
 
 //get phu tung theo id
-router.get('/:id',function(req,res){
+router.get('/:id(\\d+)',function(req,res){
     let query = "SELECT pt.*, dvt.ten AS ten_don_vi_tinh from tgr_phu_tung pt, tgr_don_vi_tinh dvt WHERE pt.id_don_vi_tinh = dvt.id and pt.id = ?";
     let attributes = [ req.params.id ];
     phutung.query( query, attributes ,function(err,rows,fields){

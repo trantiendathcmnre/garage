@@ -17,7 +17,7 @@ router.get('/', function(req,res) {
     });
 });
 
-router.get('/:id', function(req,res){
+router.get('/:id(\\d+)', function(req,res){
 
     let query = "SELECT * FROM tgr_hang_xe WHERE id = ? ";
     let attributes = [ req.params.id ];
@@ -64,7 +64,7 @@ router.put('/:id',function(req,res) {
     });
 });
 
-router.delete('/:id',function(req,res) {
+router.delete('/:id(\\d+)',function(req,res) {
 
     let query = "DELETE FROM tgr_hang_xe WHERE id = ? ";
     let attributes = [ req.params.id ];

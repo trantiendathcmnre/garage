@@ -20,7 +20,7 @@ router.get('/',function(req,res){
         }
     });
 });
-router.get('/:id',function(req,res){
+router.get('/:id(\\d+)',function(req,res){
     users.find('first',{where: "USE_ID ="+req.params.id},function(err,row){
         if(err)
         {
@@ -84,7 +84,7 @@ router.post('/phannguoidungvaonhom', function(req, res){
     }
 });
 //get thong tin nguoi dung theo account
-router.get('/thongtin/:id',function(req,res){
+router.get('/thongtin/:id(\\d+)',function(req,res){
     users.find('first',{where: "ACCOUNT ='"+req.params.id+"'"},function(err,row){
         if(err)
         {
@@ -95,4 +95,5 @@ router.get('/thongtin/:id',function(req,res){
         }
     });
 });
+
 module.exports =router;

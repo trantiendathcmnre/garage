@@ -1,27 +1,21 @@
-var express=require('express');
-var router=express.Router();
-var Db=require('../modules/db');
-var result=require('../modules/response-result');
-var PhieuKiemTra=Db.extend({tableName:"phieukiemtra"});
-var phieukiemtra=new PhieuKiemTra();
-
-var Chitiet_pk_nv=Db.extend({tableName:"chitiet_pk_nv"});
-var chitiet_pk_nv=new Chitiet_pk_nv();
+let express = require('express');
+let mysql = require('mysql');
+let router = express.Router();
+let config = require('../modules/db');
+let response = require('../modules/response-result');
+let phieukiemtra = mysql.createConnection(config);
 
 router.get('/loaiphieu/:id',function(req,res){
-    phieukiemtra.query("SELECT * from phieukiemtra pkt,xe x,dongxe dx WHERE pkt.TRANGTHAIPK<>'2' and pkt.MAXE=x.MAXE and x.MADONGXE=dx.MADONGXE",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+    phieukiemtra.query("SELECT * from tgr_phieu_kiem_tra pkt, tgr_xe xe, tgr_dong_xe dx WHERE pkt.trang_thai <> '2' and pkt.id_xe = xe.id and xe.id_dong_xe = dx.id ",function(err,rows,fields){
+        if(err) {
+            res.response(result.error(1,"Database Error !"));
+        } else {
+            res.response(result.data(rows));
         }
     });
 });
 //get phieu kiem tra sua chữa theo xe-tiep nhan sua chua
 router.get('/xe/:id',function(req,res){
-    console.log(req.params.id);
     phieukiemtra.query("SELECT * from phieukiemtra pkt,xe x,dongxe dx WHERE pkt.MAXE=x.MAXE and x.MADONGXE=dx.MADONGXE and x.MAXE='"+req.params.id+"'",function(err,rows,fields){
         if(err)
         {

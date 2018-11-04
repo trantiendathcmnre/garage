@@ -17,7 +17,7 @@ router.get('/',function(req,res){
     });
 });
 
-router.get('/:id', function(req,res){
+router.get('/:id(\\d+)', function(req,res){
 
     let query = "SELECT * FROM tgr_dong_xe WHERE id = ? ";
     let attributes = [ req.params.id ];
@@ -48,7 +48,7 @@ router.post('/', function(req, res){
     }
 });
 
-router.put('/:id',function(req,res){
+router.put('/:id(\\d+)',function(req,res){
     if(req.body.hangxe_id && req.body.ten) {
 
         let query = "UPDATE tgr_dong_xe SET mo_ta = ? WHERE id = ?";
@@ -67,7 +67,7 @@ router.put('/:id',function(req,res){
     }
 });
 
-router.delete('/:id',function(req,res){
+router.delete('/:id(\\d+)',function(req,res){
     let query = "DELETE FROM tgr_dong_xe WHERE id = ? ";
     let attributes = [ req.params.id ];
     dongxe.query(query, attributes, (err, results, fields) => {
@@ -80,7 +80,7 @@ router.delete('/:id',function(req,res){
     });
 });
 
-router.get('/search/:id', function(req,res) {
+router.get('/search/:id(\\d+)', function(req,res) {
 
     let query = "SELECT dx.*, hx.ten AS ten_hangxe from tgr_dong_xe dx ";
     query += "INNER JOIN tgr_hang_xe hx ";

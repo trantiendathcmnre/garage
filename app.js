@@ -103,9 +103,9 @@ app.use('/phutung', phutung);
 //Use controller phieu dat hang
 var phieudathang = require('./controllers/phieudathang');
 app.use('/lapphieudat', phieudathang);
-// //Use controller khach hang
-// var khachhang=require('./controllers/khachhang');
-// app.use('/khachhang',khachhang);
+//Use controller khach hang
+var khachhang=require('./controllers/khachhang');
+app.use('/khachhang',khachhang);
 // //Use controller xe
 // var xe=require('./controllers/xe');
 // app.use('/xe',xe);
