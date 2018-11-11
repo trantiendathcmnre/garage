@@ -1,128 +1,126 @@
-var express=require('express');
-var router=express.Router();
-var Db=require('../modules/db');
-var result=require('../modules/response-result');
-var moment = require('../node_modules/moment');
-var DonHang=Db.extend({tableName:"donhang"});
-var donhang=new DonHang();
+let express = require('express');
+let mysql = require('mysql');
+let fs = require('fs');
+let md5 = require('md5');
+let router = express.Router();
+let config = require('../modules/db');
+let response = require('../modules/response-result');
+let donhang = mysql.createConnection(config);
+let moment = require('../node_modules/moment');
+let now = moment().format('YYYY-MM-DD HH:mm:ss');
 
-var Chitiet_pt_dh=Db.extend({tableName:"chitiet_pt_dh"});
-var chitiet_pt_dh=new Chitiet_pt_dh();
-
-var Chitiet_dh_cong=Db.extend({tableName:"chitiet_dh_cong"});
-var chitiet_dh_cong=new Chitiet_dh_cong();
-
-var PhieuKiemTra=Db.extend({tableName:"phieukiemtra"});
-var phieukiemtra=new PhieuKiemTra();
-
-var Chitiet_dh_nv=Db.extend({tableName:"chitiet_dh_nv"});
-var chitiet_dh_nv=new Chitiet_dh_nv();
-
-var Chitiet_thanhtoan=Db.extend({tableName:"chitiet_thanhtoan"});
-var chitiet_thanhtoan=new Chitiet_thanhtoan();
-
-router.get('/',function(req,res){
-    donhang.query("SELECT * from dongxe dx,xe x,phieukiemtra pkt,donhang dh where dx.MADONGXE=x.MADONGXE and pkt.MAXE=x.MAXE and pkt.ID_PHIEUKHAM=dh.ID_PHIEUKHAM and dh.TRANGTHAI_DH IN('1','2','0')",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+router.get('/',function(req, res){
+    var query  = "SELECT * FROM tgr_dong_xe dx, tgr_xe x, tgr_phieu_kiem_tra pkt, tgr_don_hang dh ";
+        query += " WHERE dx.id = x.id_dong_xe AND pkt.id_xe = x.id AND pkt.id = dh.id_phieu_kham AND dh.trang_thai_don_hang IN('1','2','0')";
+    donhang.query(query, function(err, rows, fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
-router.get('/dangsua',function(req,res){
-    donhang.query("SELECT * from dongxe dx,xe x,phieukiemtra pkt,donhang dh where dx.MADONGXE=x.MADONGXE and pkt.MAXE=x.MAXE and pkt.ID_PHIEUKHAM=dh.ID_PHIEUKHAM and dh.TRANGTHAI_DH='3'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+
+router.get('/dangsua',function(req, res) {
+    var query  = "SELECT * FROM tgr_dong_xe dx, tgr_xe x, tgr_phieu_kiem_tra pkt, tgr_don_hang dh ";
+        query += "WHERE dx.id = x.id_dong_xe AND pkt.id_xe = x.id ";
+        query += "AND pkt.id = dh.id_phieu_kham AND dh.trang_thai_don_hang = '3'";
+    donhang.query(query, function(err, rows, fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
+
 //get don hang hoan thanh
-router.get('/hoanthanh',function(req,res){
-    donhang.query("SELECT * from dongxe dx,xe x,phieukiemtra pkt,donhang dh where dx.MADONGXE=x.MADONGXE and pkt.MAXE=x.MAXE and pkt.ID_PHIEUKHAM=dh.ID_PHIEUKHAM and dh.TRANGTHAI_DH='4'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+router.get('/hoanthanh', function(req, res) {
+    var query  = "SELECT * FROM tgr_dong_xe dx, tgr_xe x, tgr_phieu_kiem_tra pkt, tgr_don_hang dh ";
+        query += "WHERE dx.id = x.id_dong_xe AND pkt.id_xe = x.id AND pkt.id = dh.id_phieu_kham ";
+        query += "AND dh.trang_thai_don_hang = '4' ";
+    donhang.query(query, function(err, rows, fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
+
 //get don hang theo bien so xe
-router.get('/hoanthanh/biensoxe/:id',function(req,res){
-    donhang.query("SELECT * from dongxe dx,xe x,phieukiemtra pkt,donhang dh where dx.MADONGXE=x.MADONGXE and pkt.MAXE=x.MAXE and pkt.ID_PHIEUKHAM=dh.ID_PHIEUKHAM and dh.TRANGTHAI_DH='4' and x.MAXE='"+req.params.id+"'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+router.get('/hoanthanh/biensoxe/:id(\\d+)', function(req, res) {
+    var query  = "SELECT * FROM tgr_dong_xe dx, tgr_xe x, tgr_phieu_kiem_tra pkt, tgr_don_hang dh ";
+        query += "WHERE dx.id = x.id_dong_xe AND pkt.id_xe = x.id AND pkt.id = dh.id_phieu_kham ";
+        query += "AND dh.trang_thai_don_hang = '4' AND x.id = '" + req.params.id + "' ";
+    donhang.query(query, function(err, rows, fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
+
 //get nhan vien - don hang
-router.get('/nhanvien/:id',function(req,res){
-    donhang.query("SELECT nv.MANHANVIEN,nv.TENNHANVIEN,dv.TENDONVI,ct.TRANGTHAICV from donhang dh,donvilamviec dv,nhanvien nv,chitiet_dh_nv ct where dh.MADONHANG=ct.MADONHANG and dv.MADONVI=nv.MADONVI and nv.MANHANVIEN=ct.MANHANVIEN and dh.MADONHANG='"+req.params.id+"'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+router.get('/nhanvien/:id(\\d+)', function(req, res) {
+    var query = "SELECT nv.id AS id_nhan_viec, nv.ten AS ten_nhan_vien, dv.ten AS ten_don_vi, ct.trang_thai ";
+    query += "FROM tgr_don_hang dh, tgr_don_vi_lam_viec dv, tgr_nhan_vien nv, tgr_chi_tiet_don_hang_nhan_vien ct ";
+    query += "WHERE dh.id = ct.id_don_hang AND dv.id = nv.id_don_vi AND nv.id = ct.id_nhan_vien AND dh.id = '" + req.params.id + "' ";
+    donhang.query(query, function(err, rows, fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
-router.get('/:id',function(req,res){
-    donhang.find('first',{where: "MADONHANG = '"+req.params.id+"'"},function(err,row){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        }else
-        {
-            res.send(result.data(row));
+
+router.get('/:id(\\d+)',function(req,res){
+    donhang.query('SELECT * FROM tgr_don_hang WHERE id = "' + req.params.id + '"', function(err, row) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(row));
         }
     });
 });
+
 router.get('/taoma/madonhang',function(req,res){
     donhang.query("SELECT createMaDonHang() as MADONHANG",function(err,row,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(row));
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(row));
         }
     });
 });
-router.get('/donhang/phutung/:id',function(req,res){
-    donhang.query("SELECT * from donhang dh,chitiet_pt_dh ct,phutung pt,donvitinh dvt where pt.ID_DVT=dvt.ID_DVT and dh.MADONHANG=ct.MADONHANG and pt.MAPHUTUNG=ct.MAPHUTUNG and dh.MADONHANG='"+req.params.id+"'",function(err,row,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(row));
+
+router.get('/donhang/phutung/:id(\\d+)',function(req,res){
+    var query = "SELECT * FROM tgr_don_hang dh, tgr_chi_tiet_phu_tung_don_hang ct, "
+    query += "tgr_phu_tung pt, tgr_don_vi_tinh dvt WHERE pt.id_don_vi_tinh = dvt.id ";
+    query += "AND dh.id = ct.id_don_hang and pt.id = ct.id_phu_tung AND dh.id = '" + req.params.id + "' ";
+    donhang.query(query, function(err, row, fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(row));
         }
     });
 });
-router.get('/donhang/cong/:id',function(req,res){
-    donhang.query("SELECT * from donhang dh,chitiet_dh_cong ct,baogiacong bgc where bgc.MABAOGIACONG=ct.MABAOGIACONG and dh.MADONHANG=ct.MADONHANG and dh.MADONHANG='"+req.params.id+"'",function(err,row,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(row));
+
+router.get('/donhang/cong/:id(\\d+)', function(req, res) {
+    var query = "SELECT * FROM tgr_don_hang dh, tgr_chi_tiet_don_hang_cong ct, tgr_bao_gia_cong bgc ";
+    query += "WHERE bgc.id = ct.id_cong AND dh.id = ct.id_don_hang AND dh.id = '" + req.params.id + "'";
+    donhang.query(query, function(err, row, fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(row));
         }
     });
 });
+
 //luu don hang
 router.post('/', function(req, res){
     console.log(req.body.dataCong);
@@ -191,6 +189,7 @@ router.post('/', function(req, res){
         res.send(result.error(2,"Missing field"));
     }
 })
+
 //luu nhan vien sua chua xe
 router.put('/nhanvien', function(req, res){
     if(req.body.MADONHANG)
@@ -232,6 +231,7 @@ router.put('/nhanvien', function(req, res){
         });
     }
 })
+
 //put xac nhan don hang de chuyen qua sua chua
 router.put('/', function(req, res){
     if(req.body.MADONHANG){
@@ -419,18 +419,16 @@ router.get('/donhang/nhanvien/danglamviec',function(req,res){
         }
     });
 });
-router.get('/khachhang/:id',function(req,res){
-    console.log(req.params.id);
-    donhang.query("SELECT * from xe x,phieukiemtra pkt,donhang dh where x.MAXE=pkt.MAXE and pkt.ID_PHIEUKHAM=dh.ID_PHIEUKHAM and x.MAKHACHHANG='"+req.params.id+"'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+router.get('/khachhang/:id(\\d+)',function(req,res){
+    donhang.query("SELECT * FROM tgr_xe x, tgr_phieu_kiem_tra pkt, tgr_don_hang dh WHERE x.id = pkt.id_xe AND pkt.id = dh.id_phieu_kham AND x.id_khach_hang ='" + req.params.id + "'", function(err,rows,fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
+
 //get thong tin cong no
 router.get('/congnokh/:id',function(req,res){
     console.log(req.params.id);
@@ -444,6 +442,7 @@ router.get('/congnokh/:id',function(req,res){
         }
     });
 });
+
 //cong no khach hang
 router.post('/congnokh', function(req, res){
     console.log(req.body);
@@ -521,6 +520,7 @@ router.post('/congnokh', function(req, res){
         res.send(result.error(2,"Missing field"));
     }
 });
+
 //Cap nhat bao hanh cho phu tung trong don hang
 router.post('/capnhatbaohanh', function(req, res){
     donhang.query("SELECT ct.MAPHUTUNG,pt.THOIGIANBAOHANH from chitiet_pt_dh ct,phutung pt where ct.MAPHUTUNG=pt.MAPHUTUNG and ct.MADONHANG='"+req.body.MADONHANG+"'",function(err,row,fields){

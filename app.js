@@ -104,38 +104,38 @@ app.use('/phutung', phutung);
 var phieudathang = require('./controllers/phieudathang');
 app.use('/lapphieudat', phieudathang);
 //Use controller khach hang
-var khachhang=require('./controllers/khachhang');
+var khachhang = require('./controllers/khachhang');
 app.use('/khachhang',khachhang);
-// //Use controller xe
-// var xe=require('./controllers/xe');
-// app.use('/xe',xe);
-// //Use controller nhan vien
-// var nhanvien=require('./controllers/nhanvien');
-// app.use('/nhanvien',nhanvien);
-// //Use controller phieu kiem tra
-// var phieukham=require('./controllers/phieukham');
-// app.use('/phieukham',phieukham);
+//Use controller xe
+var xe = require('./controllers/xe');
+app.use('/xe',xe);
+//Use controller nhan vien
+var nhanvien = require('./controllers/nhanvien');
+app.use('/nhanvien',nhanvien);
+//Use controller phieu kiem tra
+var phieukham = require('./controllers/phieukham');
+app.use('/phieukham',phieukham);
 //Use controller bao gia cong
 var baogiacong = require('./controllers/baogiacong');
 app.use('/baogiacong',baogiacong);
-// //Use controller don hang
-// var donhang=require('./controllers/donhang');
-// app.use('/donhang',donhang);
+//Use controller don hang
+var donhang=require('./controllers/donhang');
+app.use('/donhang',donhang)
 //Use controller don vi tinh
 var donvitinh = require('./controllers/donvitinh');
 app.use('/donvitinh',donvitinh);
-// //Use user
-// var users=require('./controllers/users');
-// app.use('/users',users);
+//Use user
+var users = require('./controllers/users');
+app.use('/users',users);
 // //Use  xe sendmail
 // var sendmail=require('./controllers/sendmail');
 // app.use('/sendmail',sendmail);
 // //Use nhom nguoi dung
 // var nhomnguoidung=require('./controllers/nhomnguoidung');
 // app.use('/nhomnguoidung',nhomnguoidung);
-// //Use nguoi dung
-// var nguoidung=require('./controllers/nguoidung');
-// app.use('/nguoidung',nguoidung);
+//Use nguoi dung
+var nguoidung = require('./controllers/nguoidung');
+app.use('/nguoidung',nguoidung);
 // //Use bao tri
 // var baotri=require('./controllers/baotri');
 // app.use('/baotri',baotri);

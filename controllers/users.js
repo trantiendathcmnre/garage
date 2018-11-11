@@ -1,176 +1,150 @@
-var express=require('express');
-var router=express.Router();
-var Db=require('../modules/db');
-var result=require('../modules/response-result');
-var User=Db.extend({tableName:"users"});
-var user=new User();
-
-var Detail_group_user=Db.extend({tableName:"detail_group_user"});
-var detail_group_user=new Detail_group_user();
-
-var Roles=Db.extend({tableName:"roles"});
-var roles=new Roles();
-
-var Menu=Db.extend({tableName:"menu"});
-var menu=new Menu();
-
+let express = require('express');
+let mysql = require('mysql');
+let router = express.Router();
+let config = require('../modules/db');
+let response = require('../modules/response-result');
+let user = mysql.createConnection(config);
 const uuidv4 = require('uuid/v4');
+
 router.post('/',function(req,res){
-    if(req.body.ACCOUNT&& req.body.PASSWORD)
-    {
-    user.find('first',{where: "ACCOUNT ='"+req.body.ACCOUNT+"' and PASSWORD='"+req.body.PASSWORD+"'"},function(err,row){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        }else
-        {
-            if(row.ACCOUNT)
-            {
-                var timeout=new Date();
-                var datasend={"userId":row.USE_ID,
-                            "account":row.ACCOUNT,
-                            "fullName":row.FULLNAME,
-                            "accessToken":''
+    if( req.body.account && req.body.password ) {
+        let query = "SELECT * FROM tgr_user WHERE account = ? AND password = ? ";
+        let attributes = [ req.body.account, req.body.password ];
+        user.query(query, attributes, (err, results, fields) => {
+            if (err) {
+                res.send(response.error(1,"Database Error !"));
+            } else {
+                // get inserted id
+                res.send(response.message("Inserted id " + results.insertId));
+                if( row.account ) {
+                    var timeout = new Date();
+                    var datasend = {
+                        "userId":row.id,
+                        "account":row.account,
+                        "fullName":row.fullname,
+                        "accessToken":''
                     };
-               if( row.EXPIREDTIME>timeout)
-                {
-                    //con su dung duoc
-                    if(row.TOKEN)
-                    {
-                        //update lai thoi gentime
-                        var token=row.TOKEN;
-                        user.set("EXPIREDTIME",new Date(timeout.getTime() + 30*60000));
-                        user.save("USE_ID="+row.USE_ID,function(err,row){
+                    if( row.expired_time > timeout ) {
+                            //con su dung duoc
+                        if( row.token ) {
+                                //update lai thoi gentime
+                            var token = row.token;
+                            var expired_time = new Date(timeout.getTime() + 30*60000);
+                            var query = "UPDATE tgr_users SET expired_time = ? WHERE id = ?";
+                            var attributes = [ expired_time, row.id ];
+                            user.query(query, attributes, (err, results, fields) => {
+                                if(err)
+                                    res.send(response.error(1,"Database Error !"));
+                                else {
+                                    datasend.accessToken = token;
+                                    res.send(response.data(datasend));
+                                }
+                            });
+                        } else {
+                            //tai khoan moi chua co token
+                            var token = uuidv4();
+                            var expired_time = new Date(timeout.getTime() + 30*60000);
+                            var query = "INSERT INTO tgr_users( token, expired_time ) VALUES (?,?)";
+                            var attributes = [token, expired_time];
+                            user.query(query, attributes, (err, results, fields) => {
+                                if(err)
+                                    res.send(response.error(1,"Database Error !"));
+                                else {
+                                    datasend.accessToken = token;
+                                    res.send(response.data(datasend));
+                                }
+                            });
+                        }
+                    } else {
+                        //timeout 
+                        var token = uuidv4();
+                        var expired_time = new Date(timeout.getTime() + 30*60000);
+                        var query = "UPDATE tgr_users SET token = ?, expired_time = ? WHERE id = ?";
+                        var attributes = [token, expired_time, row.id ];
+                        user.query(query, attributes, (err, results, fields) => {
                             if(err)
-                            res.send(result.error(1,"Database Error !"));
-                            else
-                            {
-                            datasend.accessToken=token;
-                            res.send(result.data(datasend));
+                                res.send(response.error(1,"Database Error !"));
+                            else {
+                                datasend.accessToken = token;
+                                res.send(response.data(datasend));
                             }
                         });
                     }
-                    else
-                    {
-                        //tai khoan moi chua co token
-                        var token=uuidv4();
-                        user.set("TOKEN",token);
-                        user.set("EXPIREDTIME",new Date(timeout.getTime() + 30*60000));
-                        user.save("USE_ID="+row.USE_ID,function(err,row){
-                            if(err)
-                            res.send(result.error(1,"Database Error !"));
-                            else
-                            {
-                            datasend.accessToken=token;
-                            res.send(result.data(datasend));
-                            }
-                        });
-                    }
-                }
-                else
-                {
-                    //timeout
-                    console.log('token da het han');
-                    var token=uuidv4();
-                        user.set("TOKEN",token);
-                        user.set("EXPIREDTIME",new Date(timeout.getTime() + 30*60000));
-                        user.save("USE_ID="+row.USE_ID,function(err,row){
-                            if(err)
-                            res.send(result.error(1,"Database Error !"));
-                            else
-                            {
-                            datasend.accessToken=token;
-                            res.send(result.data(datasend));
-                            }
-                    });
+                } else {
+                    //sai tai khoan
+                    res.send(response.error(2,"Wrong User name or Password"));
                 }
             }
-            else
-            {
-                //sai tai khoan
-                res.send({"errorCode":1,errorMessage:'Wrong User name or Password'});
-            }
-        }
-    });
-    }
-    else
-    {
-        res.send({"errorCode":1,errorMessage:'Missing User name or Password'});
+        }); 
+    } else {
+        res.send(response.error(3,"Missing User name or Password"));
     }
 });
+
 //get nhóm quyen cua nguoi dung
-router.get('/nhomquyen/:id',function(req,res){
-    console.log('ok');
-    detail_group_user.find('all',{where:"USE_ID="+req.params.id},function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+router.get('/nhomquyen/:id',function(req,res) {
+    var query = "SELECT * FROM tgr_detail_group_user WHERE id = "+ req.params.id;
+
+    user.query(query,function( err,rows,fields ) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
+
 router.post('/dsquyen',function(req,res){
     var quyen=[];
-    if(req.body.dsnhom.length==0)
+    if(req.body.dsnhom.length == 0)
     {
-        menu.find('all',{fields: ['ID_MENU']},function(err,rows,fields){
-            if(err)
-            {
-                res.send(result.error(1,"Database Error !"));
-            }
-            else
-            {
-                for(let i of rows)
-                {
-                    quyen.push({"ID_MENU":i.ID_MENU,"ISROLE":0});
+        user.query("SELECT id FROM tgr_menu", function () {
+            if(err) {
+                res.send(response.error(1,"Database Error !"));
+            } else {
+                for(let i of rows) {
+                    quyen.push({
+                        "id":i.id,
+                        "is_role":0
+                    });
                 }
-                res.send(result.data(quyen));
+                res.send(repose.data(quyen));
 
             }
         });
     }
-    else
-    {
-        menu.find('count', function(err, kq) {
-            if(err)
-            {
-                res.send(result.error(1,"Database Error !"));
+    else {
+        user.query('SELECT COUNT(*) FROM tge_menu', function(err, kq) {
+            if(err) {
+                res.send(response.error(1,"Database Error !"));
             }
-            else
-            {
+            else  {
     
-                var dem=req.body.dsnhom.length*kq;
-                var dem1=0;
-                for(let i of req.body.dsnhom)
-                {
-                    roles.find('all',{where:"ID_GROUP="+i.ID_GROUP},function(err,rows,fields){
-                        if(err)
-                        {
-                            res.send(result.error(1,"Database Error !"));
+                var dem = req.body.dsnhom.length*kq;
+                var dem1 = 0;
+                for(let i of req.body.dsnhom) {
+                    roles.query("SELECT * FROM tgr_roles WHERE id_group = " + i.id_group , function(err,rows,fields){
+                        if(err) {
+                            res.send(response.error(1,"Database Error !"));
                         }
-                        else
-                        {
-                            for(let j of rows)
-                            {
-                                dem1=dem1+1;
-                                quyen.push({"ID_MENU":j.ID_MENU,"ISROLE":j.ISROLE});
-                                if(dem1==dem)
-                                {
+                        else {
+                            for(let j of rows) {
+                                dem1  =dem1 + 1;
+                                quyen.push({
+                                    "id_menu": j.id_menu,
+                                    "is_role": j.is_role
+                                });
+                                if( dem1 == dem ) {
                                     for(x=0;x<quyen.length-1;x++)
-                                    for(y=x+1;y<quyen.length;y++)
-                                    {
-                                        if(quyen[x].ID_MENU==quyen[y].ID_MENU)
-                                        {
-                                            if(quyen[x].ISROLE==1 || quyen[y].ISROLE==1)
-                                            {
-                                                quyen[x].ISROLE=1;
-                                                quyen.splice(y,1);
+                                        for(y=x+1;y<quyen.length;y++) {
+                                            if( quyen[x].id_menu == quyen[y].id_menu ) {
+                                                if(quyen[x].is_role == 1 || quyen[y].is_role == 1 ) {
+                                                    quyen[x].is_role = 1;
+                                                    quyen.splice( y,1 );
+                                                }
                                             }
                                         }
-                                    }
-                                    res.send(result.data(quyen));
+                                    res.send(response.data(quyen));
                                     //console.log(quyen);
                                 }
                                

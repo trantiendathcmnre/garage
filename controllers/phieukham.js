@@ -6,127 +6,97 @@ let response = require('../modules/response-result');
 let phieukiemtra = mysql.createConnection(config);
 
 router.get('/loaiphieu/:id',function(req,res){
-    phieukiemtra.query("SELECT * from tgr_phieu_kiem_tra pkt, tgr_xe xe, tgr_dong_xe dx WHERE pkt.trang_thai <> '2' and pkt.id_xe = xe.id and xe.id_dong_xe = dx.id ",function(err,rows,fields){
+    phieukiemtra.query("SELECT * FROM tgr_phieu_kiem_tra pkt, tgr_xe xe, tgr_dong_xe dx WHERE pkt.trang_thai_phieu_kiem_tra <> '2' and pkt.id_xe = xe.id and xe.id_dong_xe = dx.id ",function(err,rows,fields){
         if(err) {
-            res.response(result.error(1,"Database Error !"));
+            res.response(response.error(1,"Database Error !"));
         } else {
-            res.response(result.data(rows));
+            res.response(response.data(rows));
         }
     });
 });
+
 //get phieu kiem tra sua chữa theo xe-tiep nhan sua chua
-router.get('/xe/:id',function(req,res){
-    phieukiemtra.query("SELECT * from phieukiemtra pkt,xe x,dongxe dx WHERE pkt.MAXE=x.MAXE and x.MADONGXE=dx.MADONGXE and x.MAXE='"+req.params.id+"'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            console.log(rows);
-            res.send(result.data(rows));
+router.get('/xe/:id(\\d+)',function(req,res){
+    var query = "SELECT pkt.id AS id_phieu_kham,pkt.nguoi_lap, pkt.ngay_lap, pkt.yeu_cau_kiem_tra, pkt.noi_dung_kham, pkt.trang_thai_phieu_kiem_tra AS trang_thai_phieu_kham, ";
+    query += "x.bien_so, x.so_vin, x.so_khung, x.so_may, x.so_km, x.doi_xe, x.mau_xe, x.ngay_cap_nhat AS ngay_cap_nhat_xe, ";
+    query += "x.trang_thai AS trang_thai_xe, dx.hangxe_id AS hang_xe, dx.ten AS ten_dong_xe, dx.mo_ta AS mo_ta_dong_xe  ";
+    query += "FROM tgr_phieu_kiem_tra pkt, tgr_xe x, tgr_dong_xe dx WHERE pkt.id_xe = x.id AND x.id_dong_xe = dx.id AND x.id =" + req.params.id ;
+    phieukiemtra.query(query,function(err, rows, fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
-router.get('/nhanvien/:id',function(req,res){
-    phieukiemtra.query("SELECT * from phieukiemtra pkt,chitiet_pk_nv ct,nhanvien nv where nv.MANHANVIEN=ct.MANHANVIEN and pkt.ID_PHIEUKHAM =ct.ID_PHIEUKHAM and pkt.ID_PHIEUKHAM='"+req.params.id+"'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+
+// get nhan vien 
+router.get('/nhanvien/:id(\\d+)',function(req,res){
+    phieukiemtra.query("SELECT * FROM tgr_phieu_kiem_tra pkt, tgr_chi_tiet_phieu_kham_nhan_vien ct, tgr_nhan_vien nv WHERE nv.id = ct.id_nhan_vien AND pkt.id = ct.id_phieu_kham AND pkt.id = '" + req.params.id + "'",function(err,rows,fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
-router.get('/xe-khachhang/:id',function(req,res){
-    phieukiemtra.query("SELECT * from phieukiemtra pkt,xe x,khachhang kh,dongxe dx where dx.MADONGXE=x.MADONGXE and pkt.MAXE=x.MAXE and kh.MAKHACHHANG=x.MAKHACHHANG and pkt.ID_PHIEUKHAM='"+req.params.id+"'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+
+router.get('/xe-khachhang/:id(\\d+)',function(req,res){
+    phieukiemtra.query("SELECT * FROM tgr_phieu_kiem_tra pkt, tgr_xe x,tgr_khach_hang kh,tgr_dong_xe dx WHERE dx.id = x.id_dong_xe AND pkt.id_xe = x.id AND kh.id = x.id_khach_hang AND pkt.id = '" + req.params.id + "'",function(err,rows,fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
-// router.get('/xe/:id',function(req,res){
-//     xe.find('first',{where: "MAXE = '"+req.params.id+"'"},function(err,row){
-//         if(err)
-//         {
-//             res.send(result.error(1,"Database Error !"));
-//         }else
-//         {
-//             res.send(result.data(row));
-//         }
-//     });
-// });
+
 router.post('/', function(req, res){
-    console.log(req.body);
-    if(req.body.MAXE){
-        phieukiemtra.set('MAXE',req.body.MAXE);
-        phieukiemtra.set('NGAYLAPPHIEU',req.body.NGAYLAPPHIEU);
-        phieukiemtra.set('YEUCAUKIEMTRA',req.body.YEUCAUKIEMTRA);
-        phieukiemtra.set('NOIDUNGKHAM',req.body.NOIDUNGKHAM);
-        phieukiemtra.set('TRANGTHAIPK','1');
-        phieukiemtra.save(function(err, row){
-            if(err){
-                res.send(result.error(1,"Database Error !"));
-            }else {
-                for(let i of req.body.NHANVIEN)
-                {
-                    console.log(row);
-                    chitiet_pk_nv.set('MANHANVIEN',i.MANHANVIEN);
-                    chitiet_pk_nv.set('ID_PHIEUKHAM',row.insertId);
-                    chitiet_pk_nv.save(function(err, row){});
+    if(req.body.ten) {
+        let query = "INSERT INTO tgr_phieu_kiem_tra ( id_xe, ngay_lap, yeu_cau_kiem_tra, noi_dung_kiem_tra, trang_thai ) VALUES(?,?,?,?,?)";
+        let attributes = [ req.body.id_xe, req.body.ngay_lap, req.body.yeu_cau_kiem_tra, req.body.noi_dung_kiem_tra, '1' ];
+        phieukiemtra.query(query, attributes, (err, results, fields) => {
+            if (err) {
+                res.send(response.error(1,"Database Error !"));
+            } else {
+                for(let i of req.body.nhan_vien) {
+                    phieukiemtra.query("INSERT INTO tgr_chi_tiet_phieu_kham_nhan_vien ( id_nhan_vien, id_phieu_kham ) VALUES(" + i.id_nhan_vien + ", " + results.insertId + ")", function(err, results, fields) {
+                        if (err) 
+                            res.send(response.error(1,"Database Error !"));
+                    });
+                    
                 }
-                res.send(result.data(row));
+                // get inserted id
+                res.send(response.message("Inserted id " + results.insertId));
             }
-        });
-    }else{
-        res.send(result.error(2,"Missing field"));
+        }); 
+
+    } else {
+        res.send(response.error(2,"Missing field"));
     }
 });
-// router.put('/:id',function(req,res){
-//     if(req.body.MAxe && req.body.TENxe)
-//     {
-//         xe.set('TENxe',req.body.TENxe);
-//         xe.set('MOTAxe',req.body.MOTAxe);
-//         xe.set('MAHANGXE',req.body.MAHANGXE);
-//         xe.set('TRANGTHAI_DX',req.body.TRANGTHAI_DX);
-//         xe.save("MAxe='"+req.params.id+"'",function(err,row){
-//             if(err){
-//                 res.send(result.error(1,"Database Error !"));
-//             }else {
-//                 res.send(result.data(xe));
 
-//             }
-//        });
-//     }
-//     else{
-//         res.send(result.error(2,"Missing field"));
-//     }
-// });
 router.post('/phieukham/xacnhan', function(req, res){
     phieukiemtra.set('TRANGTHAIPK',req.body.TRANGTHAIPK);
-    phieukiemtra.save("ID_PHIEUKHAM="+req.body.ID_PHIEUKHAM,function(err,row){
+    phieukiemtra.query("UPDATE tgr_phieu_kiem_tra SET trang_thai = "+ req.body.trang_thai +" WHERE id = " + req.body.id_phieu_kham, function(err,row) {
         if(err){
-            res.send(result.error(1,"Database Error !"));
+            res.send(response.error(1,"Database Error !"));
         }else {
-            res.send(result.data(row));
+            res.send(response.data(row));
 
         }
    });
 });
+
 //lay hey nhung nhan vien dang lam viec-khong the phan nhiem vu tiep theo
 router.get('/phieukham/nhanvien/danglamviec',function(req,res){
-    chitiet_pk_nv.query("SELECT * from chitiet_pk_nv ct WHERE ct.TRANGTHAICV='0'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+    phieukiemtra.query("SELECT * FROM tgr_chi_tiet_phieu_kham_nhan_vien ct WHERE ct.trang_thai = '0'", function(err,rows,fields){
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
+
 module.exports =router;

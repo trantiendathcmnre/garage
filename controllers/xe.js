@@ -1,153 +1,137 @@
-var express=require('express');
-var router=express.Router();
-var Db=require('../modules/db');
-var result=require('../modules/response-result');
-var Xe=Db.extend({tableName:"xe"});
-var xe=new Xe();
-var DonHang=Db.extend({tableName:"donhang"});
-var donhang=new DonHang();
+let express = require('express');
+let mysql = require('mysql');
+let router = express.Router();
+let config = require('../modules/db');
+let response = require('../modules/response-result');
+let xe = mysql.createConnection(config);
+
 router.get('/',function(req,res){
-    xe.query("SELECT * from xe x,dongxe dx,hangxe hx where dx.MAHANGXE=hx.MAHANGXE and x.MADONGXE=dx.MADONGXE",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+    xe.query("SELECT * from tgr_xe x, tgr_dong_xe dx, tgr_hang_xe hx WHERE dx.hangxe_id = hx.id AND x.id_dong_xe = dx.id ", function(err,rows,fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
+
 //get xe theo trang thai xe
-router.get('/trangthai/:id',function(req,res){
-    xe.query("SELECT * from khachhang kh,xe x,dongxe dx,hangxe hx where dx.MAHANGXE=hx.MAHANGXE and x.MADONGXE=dx.MADONGXE and kh.MAKHACHHANG=x.MAKHACHHANG and x.TRANGTHAI='"+req.params.id+"'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+router.get('/trangthai/:id(\\d+)',function(req,res){
+    xe.query("SELECT x.id, dx.ten AS ten_dong_xe, kh.ten AS ten_khach_hang, bien_so, so_vin, so_khung, mau_xe, ngay_cap_nhat, trang_thai FROM tgr_khach_hang kh, tgr_xe x, tgr_dong_xe dx, tgr_hang_xe hx WHERE dx.hangxe_id = hx.id AND x.id_dong_xe = dx.id AND kh.id = x.id_khach_hang AND x.trang_thai = '" + req.params.id + "'",function(err,rows,fields){
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
+
 router.get('/makhachhang/:id',function(req,res){
-    xe.query("SELECT * from xe x,dongxe dx,hangxe hx where dx.MAHANGXE=hx.MAHANGXE and x.MADONGXE=dx.MADONGXE and x.MAKHACHHANG='"+req.params.id+"'",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+    xe.query("SELECT * FROM tgr_xe x, tgr_dong_xe dx, tgr_hang_xe hx WHERE dx.hangxe_id = hx.id AND x.id_dong_xe = dx.id AND x.id_khach_hang = '" + req.params.id + "'", function(err,rows,fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
-router.get('/:id',function(req,res){
-    xe.find('first',{where: "MAXE = '"+req.params.id+"'"},function(err,row){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        }else
-        {
-            res.send(result.data(row));
+
+router.get('/:id(\\d+)',function(req,res){
+    xe.query("SELECT * FROM tgr_xe WHERE id = '"+req.params.id + "'", function(err,row) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(row));
         }
     });
 });
+
 router.post('/', function(req, res){
-    console.log(req.body);
-    console.log('Luu xe');
-    if(req.body.MAXE && req.body.BIENSOXE){
-        xe.set('MAXE',req.body.MAXE);
-        xe.set('MADONGXE',req.body.MADONGXE);
-        xe.set('BIENSOXE',req.body.BIENSOXE);
-        xe.set('SOVIN',req.body.SOVIN);
-        xe.set('SOKHUNG',req.body.SOKHUNG);
-        xe.set('SOMAY',req.body.SOMAY);
-        xe.set('SO_KILOMET',req.body.SO_KILOMET);
-        xe.set('MAUXE',req.body.MAUXE);
-        xe.set('TRANGTHAI','1');
-        xe.set('MAKHACHHANG',req.body.MAKHACHHANG);
-        xe.save(function(err, row){
+    if( req.body.so_vin && req.body.bien_so && req.body.so_khung ){
+        let query = "INSERT INTO tgr_xe ( id_dong_xe, id_khach_hang, bien_so, so_vin, so_khung, so_may, so_km, doi_xe, mau_xe, ngay_cap_nhat, trang_thai ) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+        let attributes = [ 
+            req.body.id_dong_xe,  
+            req.body.id_khach_hang, 
+            req.body.bien_so, 
+            req.body.so_vin, 
+            req.body.so_khung, 
+            req.boby.so_may, 
+            req.body.so_km,
+            req.body.doi_xe,  
+            req.body.mau_xe, 
+            req.body.ngay_cap_nhat, 
+            req.body.trang_thai
+        ];
+        xe.query(query, attributes, function (err, row) {
             if(err){
-                res.send(result.error(1,"Database Error !"));
+                res.send(response.error(1,"Database Error !"));
             }else {
-                res.send(result.data(row));
+                res.send(response.data(row));
             }
         });
     }else{
-        res.send(result.error(2,"Missing field"));
+        res.send(response.error(2,"Missing field"));
     }
 });
-router.get('/taoma/maxe',function(req,res){
-    xe.query("SELECT createMaXe() as MAXE",function(err,row,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(row));
+
+router.put('/:id(\\d+)', function(req, res){
+    let query = "UPDATE tgr_xe SET so_vin = ?, so_khung = ?, so_may = ?, so_km = ?, doi_xe = ?, mau_xe = ?, ngay_cap_nhat = ? , trang_thai = ? WHERE id = ?";
+    let attributes = [ 
+        req.body.so_vin, 
+        req.body.so_khung, 
+        req.boby.so_may, 
+        req.body.so_km,
+        req.body.doi_xe,  
+        req.body.mau_xe, 
+        req.body.ngay_cap_nhat, 
+        req.body.trang_thai,
+        req.params.id
+    ];
+    xe.query(query, attributes, function (err, row) {
+        if(err){
+            res.send(response.error(1,"Database Error !"));
+        }else {
+            res.send(response.data(row));
         }
     });
 });
-router.put('/', function(req, res){
-    console.log(req.body);
-    if(req.body.MAXE && req.body.BIENSOXE){
-        xe.set('MADONGXE',req.body.MADONGXE);
-        xe.set('BIENSOXE',req.body.BIENSOXE);
-        xe.set('SOVIN',req.body.SOVIN);
-        xe.set('SOKHUNG',req.body.SOKHUNG);
-        xe.set('SOMAY',req.body.SOMAY);
-        xe.set('SO_KILOMET',req.body.SO_KILOMET);
-        xe.set('MAUXE',req.body.MAUXE);
-        xe.set('MAKHACHHANG',req.body.MAKHACHHANG);
-        xe.save("MAXE='"+req.body.MAXE+"'",function(err, row){
-            if(err){
-                res.send(result.error(1,"Database Error !"));
-            }else {
-                res.send(result.data(row));
-            }
-        });
-    }else{
-        res.send(result.error(2,"Missing field"));
-    }
-});
+
 //xac nhan them xe cho khach hang
 router.post('/xacnhanxe', function(req, res){
-    console.log(req.body);
-    if(req.body.MAXE){
-        xe.set('TRANGTHAI','1');
-        xe.save("MAXE='"+req.body.MAXE+"'",function(err, row){
-            if(err){
-                res.send(result.error(1,"Database Error !"));
-            }else {
-                res.send(result.data(row));
+    if(req.body.id){
+        xe.query("UPDATE tgr_xe SET trang_thai = 1 WHERE id = " + req.body.id, function(err, row){
+            if(err) {
+                res.send(response.error(1,"Database Error !"));
+            } else {
+                res.send(response.data(row));
             }
         });
-    }else{
-        res.send(result.error(2,"Missing field"));
+    } else {
+        res.send(response.error(2,"Missing field"));
     } 
 });
+
 //get so dien thoai cua khach hang theo xe
 router.get('/SDT_KH/:id',function(req,res){
     console.log(req.params.id);
-    xe.query("SELECT kh.SDT_KH,x.BIENSOXE from khachhang kh,xe x where kh.MAKHACHHANG=x.MAKHACHHANG and x.MAXE='"+req.params.id+"'",function(err,row,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(row[0]));
+    xe.query("SELECT kh.sdt, x.bien_so FROM tgr_khach_hang kh, tgr_xe x WHERE kh.id = x.id_khach_hang AND x.id = '" + req.params.id + "'", function(err,row,fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(row[0]));
         }
     });
 });
+
 //get cac xe dang sua chua de cho vao kho sua
 router.get('/dsxe/dangsua',function(req,res){
-    donhang.query("SELECT * from dongxe dx,xe x,phieukiemtra pkt,donhang dh where dx.MADONGXE=x.MADONGXE and pkt.MAXE=x.MAXE and pkt.ID_PHIEUKHAM=dh.ID_PHIEUKHAM and dh.TRANGTHAI_DH IN ('2','3')",function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+    xe.query("SELECT * FROM tgr_dong_xe dx, tgr_xe x, tgr_phieu_kiem_tra pkt, tgr_don_hang dh WHERE dx.id = x.id_dong_xe AND pkt.id_xe = x.id AND pkt.id = dh.id_phieu_kham AND dh.trang_thai IN ('2','3')", function(err,rows,fields){
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
+
 module.exports =router;
