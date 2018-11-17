@@ -97,9 +97,9 @@ router.get('/taoma/madonhang',function(req,res){
 });
 
 router.get('/donhang/phutung/:id(\\d+)',function(req,res){
-    var query = "SELECT * FROM tgr_don_hang dh, tgr_chi_tiet_phu_tung_don_hang ct, "
+    var query = "SELECT ct.*, pt.*, dvt.ten AS ten_don_vi_tinh FROM tgr_don_hang dh, tgr_chi_tiet_phu_tung_don_hang ct, "
     query += "tgr_phu_tung pt, tgr_don_vi_tinh dvt WHERE pt.id_don_vi_tinh = dvt.id ";
-    query += "AND dh.id = ct.id_don_hang and pt.id = ct.id_phu_tung AND dh.id = '" + req.params.id + "' ";
+    query += "AND dh.id = ct.id_don_hang AND pt.id = ct.id_phu_tung AND dh.id = '" + req.params.id + "' ";
     donhang.query(query, function(err, row, fields) {
         if(err) {
             res.send(response.error(1,"Database Error !"));
@@ -419,8 +419,13 @@ router.get('/donhang/nhanvien/danglamviec',function(req,res){
         }
     });
 });
+
 router.get('/khachhang/:id(\\d+)',function(req,res){
-    donhang.query("SELECT * FROM tgr_xe x, tgr_phieu_kiem_tra pkt, tgr_don_hang dh WHERE x.id = pkt.id_xe AND pkt.id = dh.id_phieu_kham AND x.id_khach_hang ='" + req.params.id + "'", function(err,rows,fields) {
+    var query = "SELECT dh.*, x.id_khach_hang, x.bien_so, x.so_vin, x.so_khung, x.so_may, x.so_km, x.doi_xe, x.mau_xe, x.model, ";
+        query += "pkt.id AS id_phieu_kiem_tra, pkt.ngay_lap AS ngay_lap_phieu_kiem_tra, pkt.nguoi_lap AS nguoi_lap_phieu_kiem_tra, ";
+        query += "pkt.noi_dung_kham, pkt.yeu_cau_kiem_tra  FROM tgr_xe x, tgr_phieu_kiem_tra pkt, tgr_don_hang dh ";
+        query += "WHERE x.id = pkt.id_xe AND pkt.id = dh.id_phieu_kham AND x.id_khach_hang ='" + req.params.id + "'";
+    donhang.query(query, function(err,rows,fields) {
         if(err) {
             res.send(response.error(1,"Database Error !"));
         } else {
@@ -430,15 +435,12 @@ router.get('/khachhang/:id(\\d+)',function(req,res){
 });
 
 //get thong tin cong no
-router.get('/congnokh/:id',function(req,res){
-    console.log(req.params.id);
-    chitiet_thanhtoan.find('all',{where: "MADONHANG='"+req.params.id+"'"},function(err,rows,fields){
-        if(err)
-        {
-            res.send(result.error(1,"Database Error !"));
-        } else
-        {
-            res.send(result.data(rows));
+router.get('/congnokh/:id(\\d+)',function(req,res){
+    donhang.query("SELECT * FROM tgr_chi_tiet_thanh_toan WHERE id_don_hang = '" + req.params.id + "'", function(err,rows,fields){
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
         }
     });
 });
@@ -557,7 +559,7 @@ function  add_months(dt, n)
   return new Date(dt.setMonth(dt.getMonth() + n));      
 }
 //get thong tin khách hàng theo biển số xe
-router.get('/biensoxe/:id', function(req, res){
+router.get('/biensoxe/:id(\\d+)', function(req, res){
     donhang.query("SELECT * from khachhang kh,xe x WHERE kh.MAKHACHHANG=x.MAKHACHHANG and x.BIENSOXE='"+req.params.id+"'",function(err,row,fields){
         if(err)
         {
@@ -578,6 +580,21 @@ router.post('/capnhat/phieuhen', function(req, res){
             res.send(result.data(row));
         }
 
+    });
+});
+
+router.get('/lichsusuachua/:id(\\d+)',function(req,res){
+    var query = "SELECT dh.*, x.id_khach_hang, x.bien_so, x.so_vin, x.so_khung, x.so_may, x.so_km, x.doi_xe, x.mau_xe, x.model, ";
+        query += "kh.ten AS ten_khach_hang, kh.dia_chi AS dia_chi_khach_hang, kh.sdt AS sdt_khach_hang, kh.tinh_thanh AS id_tinh_thanh, ";
+        query += "pkt.id AS id_phieu_kiem_tra, pkt.ngay_lap AS ngay_lap_phieu_kiem_tra, pkt.nguoi_lap AS nguoi_lap_phieu_kiem_tra, ";
+        query += "pkt.noi_dung_kham, pkt.yeu_cau_kiem_tra  FROM tgr_xe x, tgr_phieu_kiem_tra pkt, tgr_don_hang dh, tgr_khach_hang kh ";
+        query += "WHERE x.id = pkt.id_xe AND pkt.id = dh.id_phieu_kham AND kh.id = x.id_khach_hang AND x.id_khach_hang ='" + req.params.id + "'";
+    donhang.query(query, function(err,rows,fields) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(rows));
+        }
     });
 });
 module.exports =router;

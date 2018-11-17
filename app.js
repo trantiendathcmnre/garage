@@ -1,10 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var multer = require('multer');
-var fs = require('fs');
+// var multer = require('multer');
+// var fs = require('fs');
 var app = express();
-var upload = multer({dest:"tmp/"});
-var result = require('./modules/response-result');
+// var upload = multer({dest:"tmp/"});
+// var result = require('./modules/response-result');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended:true }));
@@ -127,9 +127,12 @@ app.use('/donvitinh',donvitinh);
 //Use user
 var users = require('./controllers/users');
 app.use('/users',users);
-// //Use  xe sendmail
-// var sendmail=require('./controllers/sendmail');
-// app.use('/sendmail',sendmail);
+//Use sendmail
+var sendmail = require('./controllers/sendmail');
+app.use('/sendmail', sendmail );
+//Use send sms
+var sendsms = require('./controllers/sendsms');
+app.use('/sendsms', sendsms );
 // //Use nhom nguoi dung
 // var nhomnguoidung=require('./controllers/nhomnguoidung');
 // app.use('/nhomnguoidung',nhomnguoidung);

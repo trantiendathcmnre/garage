@@ -1,31 +1,44 @@
-var express=require('express');
-var router=express.Router();
+var express = require('express');
+var router = express.Router();
 var nodemailer = require('nodemailer');
-var result=require('../modules/response-result');
-    // create reusable transporter object using the default SMTP transport
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'vanquy05dhth3@gmail.com',
-          pass: 'xngrrlxygxydqxsf'
-        }
-      });
+var response = require('../modules/response-result');
+
 router.post('/',function(req,res){
-    let to='vuvanson0203@gmail.com';
-    let subject='THÔNG BÁO SỬA CHỮA XE THÀNH CÔNG';
-    let text='Xe đã sửa chữa xong';
-    var mailOptions = {
-        from: 'vanquy05dhth3@gmail.com',
-        to: to,
-        subject: subject,
-        text: text
-      };
-    transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-            res.send(result.error(1,"Error !"));
-        } else {
-            res.send(result.error(0,"Success !"));
+
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            type: 'OAuth2',
+            clientId: '894892792387-91tkql7sa3m0i5iil8vv3ticl7t2au4g.apps.googleusercontent.com',
+            clientSecret: 'DOXqerOGubo4wKrxq1Fm0n44'
         }
-      });
+    });
+
+    let mailOptions = {
+        from: 'Phu Thong Garage ✔ <tr.tiendat.hcmunre@gmail.com>',
+        to: req.body.to,
+        subject: req.body.subject,
+        generateTextFromHTML: true,
+        html: req.body.html,
+        auth: {
+            user: 'tr.tiendat.hcmunre@gmail.com',
+            refreshToken: '1/xDAay4EgnzU9ST2sJbHzFsQaG9HC5N4pCkpuTGmyuF-gCJy4-kgVcHl3t1thE29Z',
+            accessToken: 'ya29.GltXBnEAvYq6kMd9ICB5YLQ-ByfK1Wj9oLGXFwpTuJeH7BPFomnKZQmd4PYQSHL_WBkXO8M_mZYFoKT4EuWkOLW_ZFDPcSD7BNdviXYN-tjYl-nC1f5bPr3Y31Tm',
+            expires: 3600
+        }
+    }
+
+    transporter.sendMail(mailOptions, function(err, respon) {
+        if(err) {
+            res.send(response.error(err));
+        } else {
+            res.send(response.data(respon));
+        }   
+        transporter.close();
+    });
+    transporter.close();
 });
-module.exports =router;
+
+module.exports = router;

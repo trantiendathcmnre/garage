@@ -36,7 +36,7 @@ router.get('/phieu/:id',function(req,res){
 
 //get chi tiet phieu dat
 router.get('/:id(\\d+)',function(req,res){
-    let query = "SELECT ct.id_phu_tung, pt.ten AS ten_phu_tung, dvt.ten AS ten_don_vi_tinh, ct.so_luong_dat, ct.id_phieu_dat_hang ";
+    let query = "SELECT ct.id_phu_tung, pt.ten_phu_tung AS ten_phu_tung, dvt.ten AS ten_don_vi_tinh, ct.so_luong_dat, ct.id_phieu_dat_hang ";
     query += "FROM tgr_chi_tiet_phieu_dat_phu_tung ct, tgr_phu_tung pt, tgr_don_vi_tinh dvt ";
     query += "WHERE dvt.id = pt.id_don_vi_tinh AND pt.id = ct.id_phu_tung AND ct.id_phieu_dat_hang = " + req.params.id ;
     phieudat.query( query ,function(err, rows, fields){

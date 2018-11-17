@@ -26,8 +26,8 @@ router.get('/trangthai/:id(\\d+)',function(req,res){
     });
 });
 
-router.get('/makhachhang/:id',function(req,res){
-    xe.query("SELECT * FROM tgr_xe x, tgr_dong_xe dx, tgr_hang_xe hx WHERE dx.hangxe_id = hx.id AND x.id_dong_xe = dx.id AND x.id_khach_hang = '" + req.params.id + "'", function(err,rows,fields) {
+router.get('/makhachhang/:id(\\d+)',function(req,res){
+    xe.query("SELECT x.*, dx.ten AS ten_dong_xe, hx.ma AS ma_hang_xe, hx.ten AS ten_hang_xe  FROM tgr_xe x, tgr_dong_xe dx, tgr_hang_xe hx WHERE dx.hangxe_id = hx.id AND x.id_dong_xe = dx.id AND x.id_khach_hang = '" + req.params.id + "'", function(err,rows,fields) {
         if(err) {
             res.send(response.error(1,"Database Error !"));
         } else {

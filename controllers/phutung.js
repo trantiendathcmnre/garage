@@ -48,30 +48,30 @@ router.get('/all/admin/:hx/:dx/:dm',function(req,res){
     //Ma Hang Xe=0
     console.log(req.params.ncc);
     if(req.params.hx=='0' && req.params.dx=='0' && req.params.dm=='0') {
-    query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG";
+    query="SELECT pt.ma_phu_tung,pt.ten_phu_tung, dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG";
     }
 
     if(req.params.hx=='0' && req.params.dx=='0' && req.params.dm!='0') {
-    query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where dm.MADMPHUTUNG='"+req.params.dm+"'";
+    query="SELECT pt.ma_phu_tung,pt.ten_phu_tung,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where dm.MADMPHUTUNG='"+req.params.dm+"'";
     }
     if(req.params.hx=='0' && req.params.dx!='0' && req.params.dm=='0') {
-    query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where dx.MADONGXE='"+req.params.dx+"'";
+    query="SELECT pt.ma_phu_tung,pt.ten_phu_tung,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where dx.MADONGXE='"+req.params.dx+"'";
     }
     if(req.params.hx=='0' && req.params.dx!='0' && req.params.dm!='0') {
-    query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where dx.MADONGXE='"+req.params.dx+"' and dm.MADMPHUTUNG='"+req.params.dm+"'";
+    query="SELECT pt.ma_phu_tung,pt.ten_phu_tung,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where dx.MADONGXE='"+req.params.dx+"' and dm.MADMPHUTUNG='"+req.params.dm+"'";
     }
     //Ma Hang Xe !=0
     if(req.params.hx!='0' && req.params.dx=='0' && req.params.dm=='0') {
-    query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where hx.MAHANGXE='"+req.params.hx+"'";
+    query="SELECT pt.ma_phu_tung,pt.ten_phu_tung,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where hx.MAHANGXE='"+req.params.hx+"'";
     }
     if(req.params.hx!='0' && req.params.dx=='0' && req.params.dm!='0') {
-    query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where hx.MAHANGXE='"+req.params.hx+"' and dm.MADMPHUTUNG='"+req.params.dm+"'";
+    query="SELECT pt.ma_phu_tung,pt.ten_phu_tung,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where hx.MAHANGXE='"+req.params.hx+"' and dm.MADMPHUTUNG='"+req.params.dm+"'";
     }
     if(req.params.hx!='0' && req.params.dx!='0' && req.params.dm=='0') {
-    query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where hx.MAHANGXE='"+req.params.hx+"' and dx.MADONGXE='"+req.params.dx+"'";
+    query="SELECT pt.ma_phu_tung,pt.ten_phu_tung,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where hx.MAHANGXE='"+req.params.hx+"' and dx.MADONGXE='"+req.params.dx+"'";
     }
     if(req.params.hx!='0' && req.params.dx!='0' && req.params.dm!='0') {
-    query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where hx.MAHANGXE='"+req.params.hx+"' and dx.MADONGXE='"+req.params.dx+"' and dm.MADMPHUTUNG='"+req.params.dm+"'";
+    query="SELECT pt.ma_phu_tung,pt.ten_phu_tung,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT,dx.TENDONGXE,dm.TENDMPHUTUNG,pt.SOLUONGTON,hx.TENHANGXE from phutung pt LEFT JOIN dongxe dx ON pt.MADONGXE=dx.MADONGXE LEFT JOIN hangxe hx ON hx.MAHANGXE=dx.MAHANGXE LEFT JOIN donvitinh dvt ON pt.ID_DVT=dvt.ID_DVT LEFT JOIN danhmucphutung dm ON pt.MADMPHUTUNG=dm.MADMPHUTUNG where hx.MAHANGXE='"+req.params.hx+"' and dx.MADONGXE='"+req.params.dx+"' and dm.MADMPHUTUNG='"+req.params.dm+"'";
     }
     phutung.query(query,function(err,rows,fields){
         if(err) {
@@ -179,16 +179,16 @@ router.get('/admin/:hx(\\d+)/:dx(\\d+)/:dm(\\d+)/:ncc(\\d+)',function(req,res){
 
     // if(req.params.dm=='0' && req.params.id!='0')
     // {
-    //     query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT from phutung pt,dongxe dx,hangxe hx,donvitinh dvt where pt.MADONGXE=dx.MADONGXE and hx.MAHANGXE=dx.MAHANGXE and pt.ID_DVT=dvt.ID_DVT and hx.MAHANGXE='"+req.params.id+"'";
+    //     query="SELECT pt.ma_phu_tung,pt.ten_phu_tung,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT from phutung pt,dongxe dx,hangxe hx,donvitinh dvt where pt.MADONGXE=dx.MADONGXE and hx.MAHANGXE=dx.MAHANGXE and pt.ID_DVT=dvt.ID_DVT and hx.MAHANGXE='"+req.params.id+"'";
     // }
     // if(req.params.dm!='0' && req.params.id=='0')
     // {
-    //     query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT from phutung pt,danhmucphutung dm,donvitinh dvt where pt.ID_DVT=dvt.ID_DVT and pt.dm.MADMPHUTUNG=dm.MADMPHUTUNG and dm.MADMPHUTUNG='"+req.params.dm+"'";
+    //     query="SELECT pt.ma_phu_tung,pt.ten_phu_tung,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT from phutung pt,danhmucphutung dm,donvitinh dvt where pt.ID_DVT=dvt.ID_DVT and pt.dm.MADMPHUTUNG=dm.MADMPHUTUNG and dm.MADMPHUTUNG='"+req.params.dm+"'";
     // }
     // else
     // if(req.params.dm!='0' && req.params.id!='0')
     // {
-    //  query="SELECT pt.MAPHUTUNG,pt.TENPHUTUNG,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT from phutung pt,dongxe dx,hangxe hx,donvitinh dvt,danhmucphutung dm where dm.MADMPHUTUNG=pt.MADMPHUTUNG and pt.MADONGXE=dx.MADONGXE and hx.MAHANGXE=dx.MAHANGXE and pt.ID_DVT=dvt.ID_DVT and hx.MAHANGXE='"+req.params.id+"' and dm.MADMPHUTUNG='"+req.params.dm+"'";
+    //  query="SELECT pt.ma_phu_tung,pt.ten_phu_tung,dvt.TENDVT,pt.ANH,pt.GIABAN,pt.MOTA_PT from phutung pt,dongxe dx,hangxe hx,donvitinh dvt,danhmucphutung dm where dm.MADMPHUTUNG=pt.MADMPHUTUNG and pt.MADONGXE=dx.MADONGXE and hx.MAHANGXE=dx.MAHANGXE and pt.ID_DVT=dvt.ID_DVT and hx.MAHANGXE='"+req.params.id+"' and dm.MADMPHUTUNG='"+req.params.dm+"'";
     // }
     // phutung.query(query,function(err,rows,fields){
     //     if(err)
