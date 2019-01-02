@@ -33,11 +33,11 @@ router.get('/:id(\\d+)', function(req,res){
 router.post('/', function(req, res){
     if( req.body.ten && req.body.hangxe_id){
 
-        let query = "INSERT INTO tgr_dong_xe ( ten, mo_ta, hangxe_id ) VALUES(?,?,?)";
-        let attributes = [ req.body.ten, req.body.mo_ta, req.body.hangxe_id ];
+        let query = "INSERT INTO tgr_dong_xe ( ten, mo_ta, hangxe_id, trang_thai_dong_xe ) VALUES(?,?,?,?)";
+        let attributes = [ req.body.ten, req.body.mo_ta, req.body.hangxe_id, req.body.trang_thai_dong_xe ];
         dongxe.query(query, attributes, (err, results, fields) => {
             if (err) {
-                res.send(response.error(1,"Database Error !"));
+                res.send(response.error(1,err));
             } else {
                 // get inserted id
                 res.send(response.message("Inserted id " + results.insertId));

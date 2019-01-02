@@ -45,13 +45,12 @@ router.post('/', function(req, res){
 });
 
 router.put('/:id(\\d+)',function(req,res){
-    if(req.body.hangxe_id && req.body.ten) {
-
-        let query = "UPDATE tgr_khach_hang SET ten = ?, gioi_tinh = ?, ngay_sinh = ?, dia_chi = ?, sdt = ?, email, password WHERE id = ?";
-        let attributes = [ req.body.ten,  req.body.gioi_tinh, req.body.ngay_sinh, req.body.dia_chi, req.body.sdt, req.boby.email, req.body.password ];
+    if(req.body.sdt && req.body.ten) {
+        let query = "UPDATE tgr_khach_hang SET ten = ?, gioi_tinh = ?, ngay_sinh = ?, dia_chi = ?, sdt = ?, email = ? WHERE id = ?";
+        let attributes = [ req.body.ten,  req.body.gioi_tinh, req.body.ngay_sinh, req.body.dia_chi, req.body.sdt, req.body.email, req.params.id ];
         khachhang.query(query, attributes, (err, results, fields) => {
             if (err) {
-                res.send(response.error(1,"Database Error !"));
+                res.send(response.error(1,err));
             } else {
                 // get updated id
                 res.send(response.message(results.affectedRows + " records updated"));
@@ -94,6 +93,19 @@ router.get('/generate',function(req,res){
             code += 100000;
             res.send(response.data( code ));
             
+        }
+    });
+});
+
+//get customer by sdt
+router.get('/dienthoai/:id(\\d+)',function(req,res){
+    let query = "SELECT * FROM tgr_khach_hang WHERE sdt = ?";
+    let attributes = [ req.params.id ];
+    khachhang.query( query , attributes, function(err,row) {
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            res.send(response.data(row));
         }
     });
 });

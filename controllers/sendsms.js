@@ -7,12 +7,14 @@ const client = require('twilio')(accountSid, authToken);
 
 
 router.post('/',function(req,res){
+    console.log('+84'+ req.body.to.substring(1, req.body.to.length))
     client.messages.create({
-        to: '+84377526881',
+        to: '+84'+ req.body.to.substring(1, req.body.to.length),
         from: '+1 205 346 5211',
-        body: 'This is sms'
+        body: req.body.text
     })
-    .then((messages) => console.log(messages.sid));
+    .then((messages) => res.send(response.data(messages.sid)));
+
 });
 
 module.exports = router;

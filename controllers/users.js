@@ -5,25 +5,25 @@ let config = require('../modules/db');
 let response = require('../modules/response-result');
 let user = mysql.createConnection(config);
 const uuidv4 = require('uuid/v4');
+const md5 = require('md5');
 
 router.post('/',function(req,res){
     if( req.body.account && req.body.password ) {
-        let query = "SELECT * FROM tgr_user WHERE account = ? AND password = ? ";
-        let attributes = [ req.body.account, req.body.password ];
+        let query = "SELECT * FROM tgr_users WHERE account = ? AND password = ? ";
+        let attributes = [ req.body.account, md5(req.body.password) ];
         user.query(query, attributes, (err, results, fields) => {
             if (err) {
                 res.send(response.error(1,"Database Error !"));
             } else {
-                // get inserted id
-                res.send(response.message("Inserted id " + results.insertId));
-                if( row.account ) {
+                row = results.length > 0 ? JSON.parse(JSON.stringify(results))[0] : null;
+                if( row != null && !!row.account ) {
                     var timeout = new Date();
                     var datasend = {
-                        "userId":row.id,
-                        "account":row.account,
-                        "fullName":row.fullname,
-                        "accessToken":''
+                        "tokenType": 'Bearer',
+                        "accessToken": '',
+                        "userData": row
                     };
+
                     if( row.expired_time > timeout ) {
                             //con su dung duoc
                         if( row.token ) {
@@ -72,12 +72,12 @@ router.post('/',function(req,res){
                     }
                 } else {
                     //sai tai khoan
-                    res.send(response.error(2,"Wrong User name or Password"));
+                    res.send(response.error(2,"Wrong Username or Password"));
                 }
             }
         }); 
     } else {
-        res.send(response.error(3,"Missing User name or Password"));
+        res.send(response.error(3,"Missing Username or Password"));
     }
 });
 

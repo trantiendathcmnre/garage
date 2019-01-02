@@ -1,7 +1,7 @@
 let express = require('express');
 let mysql = require('mysql');
 let fs = require('fs');
-let md5 = require('md5');
+// let md5 = require('md5');
 let router = express.Router();
 let config = require('../modules/db');
 let response = require('../modules/response-result');
@@ -585,7 +585,7 @@ router.post('/capnhat/phieuhen', function(req, res){
 
 router.get('/lichsusuachua/:id(\\d+)',function(req,res){
     var query = "SELECT dh.*, x.id_khach_hang, x.bien_so, x.so_vin, x.so_khung, x.so_may, x.so_km, x.doi_xe, x.mau_xe, x.model, ";
-        query += "kh.ten AS ten_khach_hang, kh.dia_chi AS dia_chi_khach_hang, kh.sdt AS sdt_khach_hang, kh.tinh_thanh AS id_tinh_thanh, ";
+        query += "kh.ten AS ten_khach_hang, kh.dia_chi AS dia_chi_khach_hang, kh.sdt AS sdt_khach_hang, ";
         query += "pkt.id AS id_phieu_kiem_tra, pkt.ngay_lap AS ngay_lap_phieu_kiem_tra, pkt.nguoi_lap AS nguoi_lap_phieu_kiem_tra, ";
         query += "pkt.noi_dung_kham, pkt.yeu_cau_kiem_tra  FROM tgr_xe x, tgr_phieu_kiem_tra pkt, tgr_don_hang dh, tgr_khach_hang kh ";
         query += "WHERE x.id = pkt.id_xe AND pkt.id = dh.id_phieu_kham AND kh.id = x.id_khach_hang AND x.id_khach_hang ='" + req.params.id + "'";

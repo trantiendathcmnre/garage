@@ -55,7 +55,7 @@ router.post('/', function(req, res){
             req.body.bien_so, 
             req.body.so_vin, 
             req.body.so_khung, 
-            req.boby.so_may, 
+            req.body.so_may, 
             req.body.so_km,
             req.body.doi_xe,  
             req.body.mau_xe, 
@@ -79,7 +79,7 @@ router.put('/:id(\\d+)', function(req, res){
     let attributes = [ 
         req.body.so_vin, 
         req.body.so_khung, 
-        req.boby.so_may, 
+        req.body.so_may, 
         req.body.so_km,
         req.body.doi_xe,  
         req.body.mau_xe, 

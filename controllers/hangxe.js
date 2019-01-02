@@ -32,10 +32,9 @@ router.get('/:id(\\d+)', function(req,res){
 
 
 router.post('/', function(req, res){
-    if(req.body.ma) {
-
-        let query = "INSERT INTO tgr_hang_xe (ma, ten, mo_ta ) VALUES(?,?,?)";
-        let attributes = [ req.body.ma,req.body.ten , req.body.mo_ta ];
+    if(req.body.ten) {
+        let query = "INSERT INTO tgr_hang_xe (ma, ten, mo_ta, trang_thai_hang_xe ) VALUES(?,?,?,?)";
+        let attributes = [ req.body.ma,req.body.ten , req.body.mo_ta, req.body.trang_thai_hang_xe ];
         hangxe.query(query, attributes, (err, results, fields) => {
             if (err) {
                 res.send(response.error(1,"Database Error !"));
@@ -77,6 +76,28 @@ router.delete('/:id(\\d+)',function(req,res) {
         }
     });
     
+});
+
+//generate hang xe
+router.get('/generate',function(req,res){
+    let query = "SELECT id FROM tgr_hang_xe ORDER BY id DESC LIMIT 1 OFFSET 0";
+    hangxe.query( query , function(err,row) {
+        let code = 'AM-';
+        let nextId = 0;
+
+        if(err) {
+            res.send(response.error(1,"Database Error !"));
+        } else {
+            if(row.length != 0 && row[0].id > 0) {
+                nextId = row[0].id + 1;
+                code += nextId;
+                res.send(response.data( code ));
+            }
+            code += 100000;
+            res.send(response.data( code ));
+            
+        }
+    });
 });
 
 module.exports =router;
